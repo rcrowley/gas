@@ -149,8 +149,9 @@ class Environ(dict):
 if "__main__" == __name__:
 
     import optparse
-    parser = optparse.OptionParser(add_help_option=False)
-    parser.add_option("--help", dest="help", action="store_true",
+    usage="%prog [-a<app>] [-c [<arg>][...]] [-h<host>] [-p<port>] [-n<n>]"
+    parser = optparse.OptionParser(add_help_option=False, usage=usage)
+    parser.add_option("--help", dest="help", action="help",
         default=False, help="show this help message")
     parser.add_option("-a", "--app", dest="application",
         default="static.Static", help="path to Python WSGI callable",

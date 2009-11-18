@@ -1,0 +1,59 @@
+NAME
+	Gas - prefork WSGI server and app for streaming static files
+
+SYNOPSIS
+	python gas/__init__.py [-a<app>] [-c [<arg>][...]]
+		[-h<host>] [-p<port>] [-n<n>]
+
+DESCRIPTION
+	Gas is a tiny prefork WSGI server and app for streaming static files
+	through grep-, awk- and sed-like generators.  It was written as an
+	efficient and reusable way to expose filesystems over HTTP for use
+	in internal tools at OpenDNS.  There are no plans to serve external
+	traffic through Gas.
+
+	The server itself is a combination of Jacob Kaplan-Moss's Python
+	translation of Ryan Tomayko's Ruby prefork echo server, PEP-333's
+	example WSGI server and app, and Tornado's HTTP parsing.  Little
+	of the implementation is original thought but that serves to make
+	it a bit more bulletproof.
+
+	Without GET parameters, the child processes will happily stream
+	files back to clients.  GET parameters may be added to repeatedly
+	grep, awk (soon) and sed (soon) the output.  No extra processes
+	are forked; instead, the common functionality of these utilities
+	is implemented simply in Python generators.  GET parameters are
+	processed in order to create a pipeline.  A parameter may be
+	passed more than once to process the output with that command
+	more than once.
+
+INSTALLATION
+	Installation is through Python distutils.
+
+OPTIONS
+	--help
+		Show a help message.
+	-a MODULE, --app=MODULE
+		Path to Python WSGI callable.  This uses the PYTHON_PATH.
+	-c, --construct
+		Construct a WSGI callable with the remaining arguments.
+		If not given, the WSGI app given to -a will be used as-is.
+	-h HOST, --host=HOST
+		Hostname to bind to.
+	-p PORT, --port=PORT
+		Port number to bind to.
+	-n N
+		Number of children to fork().  Each child will accept()
+		new connections repeatedly and will never be respawned.
+
+AUTHORS
+	Richard Crowley <richard@opendns.com>
+
+SEE ALSO
+	<http://github.com/rcrowley/gas>
+	<http://jacobian.org/writing/python-is-unix/>
+	<http://www.python.org/dev/peps/pep-0333/>
+	<http://github.com/facebook/tornado/blob/master/tornado/httpserver.py>
+
+LICENSE
+	Licensed under a BSD-style license.  Do what you want.
