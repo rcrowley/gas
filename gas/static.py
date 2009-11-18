@@ -2,7 +2,7 @@
 Static Gas
 Richard Crowley <richard@opendns.com>
 
-A WSGI app for streaming static files through grep-, awk- and sed-like
+Gas WSGI app for streaming static files through grep-, awk- and sed-like
 generators.
 """
 
@@ -12,7 +12,8 @@ import re
 
 class Static(object):
     """
-    A WSGI app for streaming static files.  See also:
+    Gas WSGI app for streaming static files through grep-, awk- and sed-like
+    generators.  See also:
     http://www.python.org/dev/peps/pep-0333/
 
     For the moment, everything is text/plain but it'd be nice to
@@ -21,9 +22,16 @@ class Static(object):
     """
 
     def __init__(self, document_root):
+        """
+        Create a Gas WSGI app to serve files from the given
+        document_root.
+        """
         self.document_root = document_root
 
     def __call__(self, environ, start_response):
+        """
+        Process a request.
+        """
         pathname = os.path.join(self.document_root, environ["PATH_INFO"][1:])
 
         if "GET" != environ["REQUEST_METHOD"]:

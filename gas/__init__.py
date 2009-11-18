@@ -2,7 +2,7 @@
 Gas
 Richard Crowley <richard@opendns.com>
 
-Gas prefork WSGI server and friends.
+Gas prefork WSGI server.
 (With apologies to Jacob Kaplan-Moss and Ryan Tomayko.)
 """
 
@@ -12,18 +12,25 @@ import sys
 
 class Gas(object):
     """
-    A prefork HTTP server.  See also:
+    Gas prefork WSGI server.  See also:
     http://jacobian.org/writing/python-is-unix/
     http://www.python.org/dev/peps/pep-0333/
     """
 
     def __init__(self, application, host="localhost", port=80, n=3):
+        """
+        Create a Gas WSGI server for the given application at the given
+        host and port with the given number of children.
+        """
         self.application = application
         self.host = host
         self.port = port
         self.n = n
 
     def run(self):
+        """
+        Fork children and wait until KeyboardInterrupt.
+        """
         self.acceptor = socket.socket()
         self.acceptor.bind((self.host, self.port))
         self.acceptor.listen(10)
@@ -42,6 +49,9 @@ class Gas(object):
             sys.exit()
 
     def child(self):
+        """
+        Accept and handle requests until KeyboardInterrupt.
+        """
         while 1:
             conn, addr = self.acceptor.accept()
             fd = conn.makefile()
@@ -95,8 +105,11 @@ class Environ(dict):
     """
 
     def __init__(self, fd, host="localhost", port=80):
+        """
+        Create a WSGI environment.
+        """
 
-        # Setup base environment
+        # Base
         dict.__init__(self, dict(os.environ.items()))
         self["wsgi.input"] = fd
         self["wsgi.errors"] = sys.stderr
@@ -106,7 +119,7 @@ class Environ(dict):
         self["wsgi.run_once"] = True
         self["wsgi.url_scheme"] = "http"
 
-        # GET /foo/bar HTTP/1.1
+        # Parse request line
         self.method, self.uri, self.protocol = fd.next().strip().split()
         # TODO Error checking
         self["REQUEST_METHOD"] = self.method
@@ -121,7 +134,7 @@ class Environ(dict):
         self["SERVER_PORT"] = port
         self["SERVER_PROTOCOL"] = self.protocol
 
-        # Headers
+        # Parse headers
         for line in fd:
             line = line.strip()
             if "" == line:
