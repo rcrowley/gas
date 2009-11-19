@@ -92,3 +92,20 @@ class Static(object):
         """
         for line in fd:
             yield line
+
+    def wc(self, fd, arg):
+        """
+        Count characters or lines in the given iterable.
+        """
+        if "c" == arg:
+            chars = 0
+            for line in fd:
+                chars += len(line)
+            yield "%s\n" % chars
+        if "l" == arg:
+            lines = 0
+            for line in fd:
+                lines += 1
+            yield "%s\n" % lines
+        else:
+            yield ""
